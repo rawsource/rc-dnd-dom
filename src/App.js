@@ -27,17 +27,13 @@ const App = () => {
   const onDrag = (event) => {
     target = event.target
     requestAnimationFrame(() => {
-      if (target) {
-        event.target.classList.add('dim')
-      }
+      target && event.target.classList.add('dim')
     })
   }
 
   const onDragEnd = (event) => {
     insertLocation.current.classList.remove('display-block')
-    if (target) {
-      event.target.classList.remove('dim')
-    }
+    target && target.classList.remove('dim')
     target = undefined
   }
 
@@ -66,12 +62,14 @@ const App = () => {
     } else {
       insertLocation.current.style.top = rect.top + 'px'
     }
+
     insertLocation.current.style.left = rect.left + 'px'
     insertLocation.current.style.width = rect.width + 'px'
   }
 
   const onDrop = (event) => {
     event.stopPropagation()
+
     const rect = event.target.getBoundingClientRect()
     const y = event.clientY - rect.top
 
