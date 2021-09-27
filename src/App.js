@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 
 import './App.css'
 
+
 const App = () => {
 
   const [state] = useState(
@@ -23,7 +24,7 @@ const App = () => {
 
   let target = undefined
 
-  const dragstart = (event) => {
+  const onDrag = (event) => {
     target = event.target
     requestAnimationFrame(() => {
       if (target) {
@@ -32,19 +33,19 @@ const App = () => {
     })
   }
 
-  const dragend = (event) => {
-    insertLocation.current.style.display = 'none'
+  const onDragEnd = (event) => {
+    insertLocation.current.classList.remove('display-block')
     if (target) {
       event.target.classList.remove('dim')
     }
     target = undefined
   }
 
-  const dragleave = (event) => {
-    insertLocation.current.style.display = 'none'
+  const onDragLeave = (event) => {
+    insertLocation.current.classList.remove('display-block')
   }
 
-  const dragover = (event) => {
+  const onDragOver = (event) => {
     if (event.target === target) {
       return
     }
@@ -55,7 +56,7 @@ const App = () => {
 
     event.preventDefault()
 
-    insertLocation.current.style.display = 'block'
+    insertLocation.current.classList.add('display-block')
 
     const rect = event.target.getBoundingClientRect()
     const y = event.clientY - rect.top
@@ -69,7 +70,7 @@ const App = () => {
     insertLocation.current.style.width = rect.width + 'px'
   }
 
-  const drop = (event) => {
+  const onDrop = (event) => {
     event.stopPropagation()
     const rect = event.target.getBoundingClientRect()
     const y = event.clientY - rect.top
@@ -102,15 +103,15 @@ const App = () => {
       <div className="insert-location" ref={insertLocation}></div>
       <div
         className="sortable-list row"
-        onDragEnd={dragend}
-        onDrop={drop}
+        onDragEnd={onDragEnd}
+        onDrop={onDrop}
       >
         <div
           className="col"
-          onDragOver={dragover}
-          onDragLeave={dragleave}
-          onDragEnd={dragend}
-          onDrop={drop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
         >
           {state.map((item) => (
             <div
@@ -118,11 +119,11 @@ const App = () => {
               data-id={item.id}
               className="custom"
               draggable="true"
-              onDrag={dragstart}
-              onDragOver={dragover}
-              onDragLeave={dragleave}
-              onDragEnd={dragend}
-              onDrop={drop}
+              onDrag={onDrag}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+              onDragEnd={onDragEnd}
+              onDrop={onDrop}
             >
               {item.name}
             </div>
@@ -132,34 +133,34 @@ const App = () => {
       <div
         className="sortable-list row"
         draggable="true"
-        onDrag={dragstart}
-        onDragEnd={dragend}
-        onDrop={drop}
+        onDrag={onDrag}
+        onDragEnd={onDragEnd}
+        onDrop={onDrop}
       >
         <div
           className="col"
-          onDragOver={dragover}
-          onDragLeave={dragleave}
-          onDragEnd={dragend}
-          onDrop={drop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
         >
 
         </div>
         <div
           className="col"
-          onDragOver={dragover}
-          onDragLeave={dragleave}
-          onDragEnd={dragend}
-          onDrop={drop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
         >
 
         </div>
         <div
           className="col"
-          onDragOver={dragover}
-          onDragLeave={dragleave}
-          onDragEnd={dragend}
-          onDrop={drop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
         >
 
         </div>
@@ -167,25 +168,25 @@ const App = () => {
       <div
           className="sortable-list row"
           draggable="true"
-          onDrag={dragstart}
-          onDragEnd={dragend}
-          onDrop={drop}
+          onDrag={onDrag}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
         >
           <div
             className="col"
-            onDragOver={dragover}
-            onDragLeave={dragleave}
-            onDragEnd={dragend}
-            onDrop={drop}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDragEnd={onDragEnd}
+            onDrop={onDrop}
           >
 
           </div>
           <div
             className="col"
-            onDragOver={dragover}
-            onDragLeave={dragleave}
-            onDragEnd={dragend}
-            onDrop={drop}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDragEnd={onDragEnd}
+            onDrop={onDrop}
           >
 
           </div>

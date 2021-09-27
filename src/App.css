@@ -1,33 +1,39 @@
+:root {
+  --gutter: 20px;
+  --gray1: #aaa;
+  --gray2: #ccc;
+  --gray3: #eee;
+  --gray4: whiteSmoke;
+}
+
 body {
   margin: 0;
   font-family: sans-serif;
 }
 
 .App {
-  margin: 20px;
+  margin: var(--gutter);
 }
 
 .custom {
-  padding: 20px;
-  background: whiteSmoke;
+  padding: var(--gutter);
+  background: var(--gray4);
 }
 
 .insert-location {
-  border-top: 2px solid #aaa;
-  position: absolute;
-  width: 240px;
   display: none;
-  z-index: 10;
+  position: absolute;
   pointer-events: none;
+  border-top: 2px solid var(--gray1);
 }
 
 .sortable-list {
-  min-height: 20px;
-  background: #eee;
-  padding: 20px;
-  border: 1px solid #ccc;
-  overflow: auto;
   margin: -1px;
+  overflow: auto;
+  padding: var(--gutter);
+  background: var(--gray3);
+  min-height: var(--gutter);
+  border: 1px solid var(--gray2);
 }
 
 .row {
@@ -35,13 +41,17 @@ body {
 }
 
 .col {
-  border: 1px solid #ccc;
-  min-height: 20px;
-  background: white;
   flex: 1;
   margin-left: -1px;
+  background: white;
+  min-height: var(--gutter);
+  border: 1px solid var(--gray2);
 }
 
 .dim {
   opacity: 0.25;
+}
+
+.display-block {
+  display: block;
 }
