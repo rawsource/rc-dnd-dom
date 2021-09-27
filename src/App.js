@@ -55,12 +55,13 @@ const App = () => {
     insertLocation.current.classList.add('display-block')
 
     const rect = event.target.getBoundingClientRect()
+    const scrollY = Math.round(window.scrollY)
     const y = event.clientY - rect.top
 
     if (y > rect.height / 2) {
-      insertLocation.current.style.top = rect.top + rect.height + 'px'
+      insertLocation.current.style.top = (rect.top + scrollY) + rect.height + 'px'
     } else {
-      insertLocation.current.style.top = rect.top + 'px'
+      insertLocation.current.style.top = (rect.top + scrollY) + 'px'
     }
 
     insertLocation.current.style.left = rect.left + 'px'
@@ -164,31 +165,31 @@ const App = () => {
         </div>
       </div>
       <div
-          className="sortable-list row"
-          draggable="true"
-          onDrag={onDrag}
+        className="sortable-list row"
+        draggable="true"
+        onDrag={onDrag}
+        onDragEnd={onDragEnd}
+        onDrop={onDrop}
+      >
+        <div
+          className="col"
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
           onDragEnd={onDragEnd}
           onDrop={onDrop}
         >
-          <div
-            className="col"
-            onDragOver={onDragOver}
-            onDragLeave={onDragLeave}
-            onDragEnd={onDragEnd}
-            onDrop={onDrop}
-          >
 
-          </div>
-          <div
-            className="col"
-            onDragOver={onDragOver}
-            onDragLeave={onDragLeave}
-            onDragEnd={onDragEnd}
-            onDrop={onDrop}
-          >
-
-          </div>
         </div>
+        <div
+          className="col"
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
+        >
+
+        </div>
+      </div>
     </div>
   )
 }
