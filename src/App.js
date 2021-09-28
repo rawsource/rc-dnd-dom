@@ -2,21 +2,146 @@ import { useState, useRef } from 'react'
 
 import './App.css'
 
+const Component = ({ onDrag }) => {
+  return (
+    <div
+      className="item"
+      draggable="true"
+      onDrag={onDrag}
+    >
+      Item
+    </div>
+  )
+}
+
+const Row = ({ item: { children }, onDrag }) => {
+  return (
+    <div
+      className="sortable-list row"
+      draggable="true"
+      onDrag={onDrag}
+    >
+      {children.map(item => (
+        <Column
+          item={item}
+          key={item.id}
+          onDrag={onDrag}
+        />
+      ))}
+    </div>
+  )
+}
+
+const Column = ({ item: { children }, onDrag }) => {
+  return (
+    <div
+      className="col"
+    >
+      {children.map(item => (
+        <Select item={item} key={item.id} onDrag={onDrag} />
+      ))}
+    </div>
+  )
+}
+
+const Select = ({ item, onDrag }) => {
+  switch (item.type) {
+    case 'component':
+      return item.component && <Component onDrag={onDrag} />
+    case 'row':
+      return <Row item={item} onDrag={onDrag} />
+    default:
+      return null
+  }
+}
+
+const GridRenderer = ({ data, onDrag, onDragOver, onDragLeave, onDragEnd, onDrop }) => (
+  <div
+    className="sortable-list row display-block"
+    onDragEnd={onDragEnd}
+    onDrop={onDrop}
+  >
+    <div
+      className="col"
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+    >
+      {data.map(item => (
+        <Select item={item} key={item.id} onDrag={onDrag} />
+      ))}
+    </div>
+  </div>
+)
+
 
 const App = () => {
 
-  const [state] = useState(
+  const [ data ] = useState(
     [
-      { id: 1, name: 'drag' },
-      { id: 2, name: 'and' },
-      { id: 3, name: 'drop' },
-      { id: 4, name: 'support' },
-      { id: 5, name: 'for' },
-      { id: 6, name: 'dom' },
-      { id: 7, name: 'nodes' },
-      { id: 8, name: 'is' },
-      { id: 9, name: 'pretty' },
-      { id: 10, name: 'easy' }
+      {
+        "component": {
+          "data": {
+            "name": "Item"
+            },
+            "type": "BasicWidget"
+        },
+        "type": "component",
+        "id": 5
+      },
+      {
+        "type": "row",
+        "id": 1,
+        "children": [
+          {
+            "type": "column",
+            "id": 2,
+            "children": [
+              {
+                "component": {
+                  "data": {
+                    "name": "Item"
+                    },
+                    "type": "BasicWidget"
+                },
+                "type": "component",
+                "id": 3
+              },
+              {
+                "type": "row",
+                "id": 6,
+                "children": [
+                  {
+                    "type": "column",
+                    "id": 7,
+                    "children": [
+                      {
+                        "component": {
+                          "data": {
+                            "name": "Item"
+                            },
+                            "type": "BasicWidget"
+                        },
+                        "type": "component",
+                        "id": 8
+                      }
+                    ]
+                  },
+                  {
+                    "type": "column",
+                    "id": 4,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "column",
+            "id": 4,
+            "children": []
+          }
+        ]
+      }
     ]
   )
 
@@ -99,101 +224,15 @@ const App = () => {
 
   return (
     <div className="App">
+      <GridRenderer
+        data={data}
+        onDrag={onDrag}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDragEnd={onDragEnd}
+        onDrop={onDrop}
+      />
       <div className="insert-location" ref={insertLocation}></div>
-      <div
-        className="sortable-list row display-block"
-        onDragEnd={onDragEnd}
-        onDrop={onDrop}
-      >
-        <div
-          className="col"
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDragEnd={onDragEnd}
-          onDrop={onDrop}
-        >
-          {state.map((item) => (
-            <div
-              key={item.id}
-              data-id={item.id}
-              className="item"
-              draggable="true"
-              onDrag={onDrag}
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              onDragEnd={onDragEnd}
-              onDrop={onDrop}
-            >
-              {item.name}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div
-        className="sortable-list row"
-        draggable="true"
-        onDrag={onDrag}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onDragEnd={onDragEnd}
-        onDrop={onDrop}
-      >
-        <div
-          className="col"
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDragEnd={onDragEnd}
-          onDrop={onDrop}
-        >
-
-        </div>
-        <div
-          className="col"
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDragEnd={onDragEnd}
-          onDrop={onDrop}
-        >
-
-        </div>
-        <div
-          className="col"
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDragEnd={onDragEnd}
-          onDrop={onDrop}
-        >
-
-        </div>
-      </div>
-      <div
-        className="sortable-list row"
-        draggable="true"
-        onDrag={onDrag}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onDragEnd={onDragEnd}
-        onDrop={onDrop}
-      >
-        <div
-          className="col"
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDragEnd={onDragEnd}
-          onDrop={onDrop}
-        >
-
-        </div>
-        <div
-          className="col"
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDragEnd={onDragEnd}
-          onDrop={onDrop}
-        >
-
-        </div>
-      </div>
     </div>
   )
 }
