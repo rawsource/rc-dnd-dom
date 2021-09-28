@@ -2,14 +2,14 @@ import { useState, useRef } from 'react'
 
 import './App.css'
 
-const Component = ({ onDrag }) => {
+const Component = ({ item, onDrag }) => {
   return (
     <div
       className="item"
       draggable="true"
       onDrag={onDrag}
     >
-      Item
+      {item.data.name}
     </div>
   )
 }
@@ -47,7 +47,7 @@ const Column = ({ item: { children }, onDrag }) => {
 const Select = ({ item, onDrag }) => {
   switch (item.type) {
     case 'component':
-      return item.component && <Component onDrag={onDrag} />
+      return item.component && <Component item={item.component} onDrag={onDrag} />
     case 'row':
       return <Row item={item} onDrag={onDrag} />
     default:
@@ -81,7 +81,7 @@ const App = () => {
       {
         "component": {
           "data": {
-            "name": "Item"
+            "name": "Item 1"
             },
             "type": "BasicWidget"
         },
@@ -99,7 +99,7 @@ const App = () => {
               {
                 "component": {
                   "data": {
-                    "name": "Item"
+                    "name": "Item 2"
                     },
                     "type": "BasicWidget"
                 },
@@ -117,7 +117,7 @@ const App = () => {
                       {
                         "component": {
                           "data": {
-                            "name": "Item"
+                            "name": "Item 3"
                             },
                             "type": "BasicWidget"
                         },
