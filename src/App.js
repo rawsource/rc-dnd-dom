@@ -101,7 +101,7 @@ const App = () => {
     <div className="App">
       <div className="insert-location" ref={insertLocation}></div>
       <div
-        className="sortable-list row"
+        className="sortable-list row display-block"
         onDragEnd={onDragEnd}
         onDrop={onDrop}
       >
@@ -116,7 +116,7 @@ const App = () => {
             <div
               key={item.id}
               data-id={item.id}
-              className="custom"
+              className="item"
               draggable="true"
               onDrag={onDrag}
               onDragOver={onDragOver}

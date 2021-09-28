@@ -15,11 +15,6 @@ body {
   margin: var(--gutter);
 }
 
-.custom {
-  padding: var(--gutter);
-  background: var(--gray4);
-}
-
 .insert-location {
   display: none;
   position: absolute;
@@ -38,14 +33,22 @@ body {
 
 .row {
   display: flex;
+  flex: 1;
 }
 
 .col {
   flex: 1;
+  display: flex;
   margin-left: -1px;
   background: white;
+  flex-direction: column;
   min-height: var(--gutter);
   border: 1px solid var(--gray2);
+}
+
+.item {
+  padding: var(--gutter);
+  background: var(--gray4);
 }
 
 .dim {
