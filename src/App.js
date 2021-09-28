@@ -133,6 +133,8 @@ const App = () => {
         className="sortable-list row"
         draggable="true"
         onDrag={onDrag}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
         onDragEnd={onDragEnd}
         onDrop={onDrop}
       >
@@ -168,6 +170,8 @@ const App = () => {
         className="sortable-list row"
         draggable="true"
         onDrag={onDrag}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
         onDragEnd={onDragEnd}
         onDrop={onDrop}
       >

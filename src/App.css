@@ -52,6 +52,10 @@ body {
   opacity: 0.25;
 }
 
+.dim > * {
+  pointer-events: none;
+}
+
 .display-block {
   display: block;
 }
