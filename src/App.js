@@ -17,14 +17,14 @@ const Component = ({ item, onDrag }) => {
 const Row = ({ item: { children }, onDrag }) => {
   return (
     <div
-      className="sortable-list row"
+      className="row"
       draggable="true"
       onDrag={onDrag}
     >
       {children.map(item => (
         <Column
-          item={item}
           key={item.id}
+          item={item}
           onDrag={onDrag}
         />
       ))}
@@ -38,7 +38,7 @@ const Column = ({ item: { children }, onDrag }) => {
       className="col"
     >
       {children.map(item => (
-        <Select item={item} key={item.id} onDrag={onDrag} />
+        <Select key={item.id} item={item} onDrag={onDrag} />
       ))}
     </div>
   )
@@ -57,7 +57,7 @@ const Select = ({ item, onDrag }) => {
 
 const GridRenderer = ({ data, onDrag, onDragOver, onDragLeave, onDragEnd, onDrop }) => (
   <div
-    className="sortable-list row display-block"
+    className="row display-block"
     onDragEnd={onDragEnd}
     onDrop={onDrop}
   >
@@ -67,7 +67,7 @@ const GridRenderer = ({ data, onDrag, onDragOver, onDragLeave, onDragEnd, onDrop
       onDragLeave={onDragLeave}
     >
       {data.map(item => (
-        <Select item={item} key={item.id} onDrag={onDrag} />
+        <Select key={item.id} item={item} onDrag={onDrag} />
       ))}
     </div>
   </div>
@@ -145,25 +145,24 @@ const App = () => {
     ]
   )
 
+  const [ target, setTarget ] = useState(undefined)
   const insertLocation = useRef(null)
 
-  let target = undefined
-
   const onDrag = (event) => {
-    target = event.target
+    setTarget(event.target)
     requestAnimationFrame(() => {
       target && event.target.classList.add('dim')
     })
   }
 
   const onDragEnd = (event) => {
-    insertLocation.current.classList.remove('display-block')
     target && target.classList.remove('dim')
-    target = undefined
+    insertLocation.current.classList.remove('active')
+    setTarget(undefined)
   }
 
   const onDragLeave = (event) => {
-    insertLocation.current.classList.remove('display-block')
+    insertLocation.current.classList.remove('active')
   }
 
   const onDragOver = (event) => {
@@ -177,20 +176,20 @@ const App = () => {
 
     event.preventDefault()
 
-    insertLocation.current.classList.add('display-block')
+    insertLocation.current.classList.add('active')
 
     const rect = event.target.getBoundingClientRect()
     const scrollY = Math.round(window.scrollY)
     const y = event.clientY - rect.top
 
     if (y > rect.height / 2) {
-      insertLocation.current.style.top = (rect.top + scrollY) + rect.height + 'px'
+      insertLocation.current.attributeStyleMap.set('top', CSS.px(rect.top + scrollY + rect.height))
     } else {
-      insertLocation.current.style.top = (rect.top + scrollY) + 'px'
+      insertLocation.current.attributeStyleMap.set('top', CSS.px(rect.top + scrollY))
     }
 
-    insertLocation.current.style.left = rect.left + 'px'
-    insertLocation.current.style.width = rect.width + 'px'
+    insertLocation.current.attributeStyleMap.set('left', CSS.px(rect.left))
+    insertLocation.current.attributeStyleMap.set('width', CSS.px(rect.width))
   }
 
   const onDrop = (event) => {
@@ -199,26 +198,22 @@ const App = () => {
     const rect = event.target.getBoundingClientRect()
     const y = event.clientY - rect.top
 
-    try {
-      if (event.target.classList.contains('col') && event.target.children.length === 0) {
-        event.target.appendChild(target)
-        return
-      }
-
-      if (event.target.classList.contains('col') && event.target.children.length > 0) {
-        event.target.appendChild(target)
-        return
-      }
-
-      if (event.target.parentNode.classList.contains('col')) {
-        if (y > rect.height / 2) {
-          event.target.parentNode.insertBefore(target, event.target.nextSibling)
-        } else {
-          event.target.parentNode.insertBefore(target, event.target)
-        }
-      }
-    } catch (DOMException) {
+    if (event.target.classList.contains('col') && event.target.children.length === 0) {
+      event.target.appendChild(target)
       return
+    }
+
+    if (event.target.classList.contains('col') && event.target.children.length > 0) {
+      event.target.appendChild(target)
+      return
+    }
+
+    if (event.target.parentNode.classList.contains('col')) {
+      if (y > rect.height / 2) {
+        event.target.parentNode.insertBefore(target, event.target.nextSibling)
+      } else {
+        event.target.parentNode.insertBefore(target, event.target)
+      }
     }
   }
 

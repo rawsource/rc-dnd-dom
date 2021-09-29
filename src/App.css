@@ -22,18 +22,18 @@ body {
   border-top: 2px solid var(--gray1);
 }
 
-.sortable-list {
+  .insert-location.active {
+    display: block;
+  }
+
+.row {
+  flex: 1;
   margin: -1px;
+  display: flex;
   overflow: auto;
   padding: var(--gutter);
   background: var(--gray3);
-  min-height: var(--gutter);
   border: 1px solid var(--gray2);
-}
-
-.row {
-  display: flex;
-  flex: 1;
 }
 
 .col {
@@ -55,9 +55,9 @@ body {
   opacity: 0.25;
 }
 
-.dim > * {
-  pointer-events: none;
-}
+  .dim > * {
+    pointer-events: none;
+  }
 
 .display-block {
   display: block;
