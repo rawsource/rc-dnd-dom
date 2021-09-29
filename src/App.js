@@ -14,14 +14,16 @@ const Component = ({ item, onDrag }) => {
   )
 }
 
-const Row = ({ item: { children }, onDrag }) => {
+const Row = ({ item, onDrag, onClick }) => {
   return (
     <div
       className="row"
       draggable="true"
+      data-id={item.id}
       onDrag={onDrag}
+      onClick={onClick}
     >
-      {children.map(item => (
+      {item.children.map(item => (
         <Column
           key={item.id}
           item={item}
@@ -32,30 +34,30 @@ const Row = ({ item: { children }, onDrag }) => {
   )
 }
 
-const Column = ({ item: { children }, onDrag }) => {
+const Column = ({ item: { children }, onDrag, onClick }) => {
   return (
     <div
       className="col"
     >
       {children.map(item => (
-        <Select key={item.id} item={item} onDrag={onDrag} />
+        <Select key={item.id} item={item} onDrag={onDrag} onClick={onClick} />
       ))}
     </div>
   )
 }
 
-const Select = ({ item, onDrag }) => {
+const Select = ({ item, onDrag, onClick }) => {
   switch (item.type) {
     case 'component':
       return item.component && <Component item={item.component} onDrag={onDrag} />
     case 'row':
-      return <Row item={item} onDrag={onDrag} />
+      return <Row item={item} onDrag={onDrag} onClick={onClick} />
     default:
       return null
   }
 }
 
-const GridRenderer = ({ data, onDrag, onDragOver, onDragLeave, onDragEnd, onDrop }) => (
+const GridRenderer = ({ data, onDrag, onDragOver, onDragLeave, onDragEnd, onDrop, onClick }) => (
   <div
     className="row display-block"
     onDragEnd={onDragEnd}
@@ -67,7 +69,7 @@ const GridRenderer = ({ data, onDrag, onDragOver, onDragLeave, onDragEnd, onDrop
       onDragLeave={onDragLeave}
     >
       {data.map(item => (
-        <Select key={item.id} item={item} onDrag={onDrag} />
+        <Select key={item.id} item={item} onDrag={onDrag} onClick={onClick} />
       ))}
     </div>
   </div>
@@ -76,7 +78,7 @@ const GridRenderer = ({ data, onDrag, onDragOver, onDragLeave, onDragEnd, onDrop
 
 const App = () => {
 
-  const [ data ] = useState(
+  const [ data, setData ] = useState(
     [
       {
         "component": {
@@ -86,15 +88,31 @@ const App = () => {
             "type": "BasicWidget"
         },
         "type": "component",
-        "id": 5
+        "id": crypto.randomUUID()
       },
       {
         "type": "row",
-        "id": 1,
+        "id": crypto.randomUUID(),
         "children": [
           {
             "type": "column",
-            "id": 2,
+            "id": crypto.randomUUID(),
+            "children": []
+          },
+          {
+            "type": "column",
+            "id": crypto.randomUUID(),
+            "children": []
+          }
+        ]
+      },
+      {
+        "type": "row",
+        "id": crypto.randomUUID(),
+        "children": [
+          {
+            "type": "column",
+            "id": crypto.randomUUID(),
             "children": [
               {
                 "component": {
@@ -104,15 +122,15 @@ const App = () => {
                     "type": "BasicWidget"
                 },
                 "type": "component",
-                "id": 3
+                "id": crypto.randomUUID()
               },
               {
                 "type": "row",
-                "id": 6,
+                "id": crypto.randomUUID(),
                 "children": [
                   {
                     "type": "column",
-                    "id": 7,
+                    "id": crypto.randomUUID(),
                     "children": [
                       {
                         "component": {
@@ -122,13 +140,18 @@ const App = () => {
                             "type": "BasicWidget"
                         },
                         "type": "component",
-                        "id": 8
+                        "id": crypto.randomUUID()
                       }
                     ]
                   },
                   {
                     "type": "column",
-                    "id": 4,
+                    "id": crypto.randomUUID(),
+                    "children": []
+                  },
+                  {
+                    "type": "column",
+                    "id": crypto.randomUUID(),
                     "children": []
                   }
                 ]
@@ -137,7 +160,7 @@ const App = () => {
           },
           {
             "type": "column",
-            "id": 4,
+            "id": crypto.randomUUID(),
             "children": []
           }
         ]
@@ -217,6 +240,36 @@ const App = () => {
     }
   }
 
+  const onClick = (event) => {
+    if (event.target.classList.contains('row')) {
+      const res = searchItems(data, event.target.dataset.id)
+      res.children.push({ type: 'column', id: crypto.randomUUID(), children: [] })
+      setData([...data])
+    }
+  }
+
+  const searchItem = (item, id) => {
+    if (item.id === id) {
+      return item
+    } else if (item.children != null) {
+      let result = null
+      for (let i = 0; result == null && i < item.children.length; i++) {
+        result = searchItem(item.children[i], id)
+      }
+      return result
+    }
+    return null
+  }
+
+  const searchItems = (items, id) => {
+    for (let i = 0; i < items.length; i++) {
+      let item = searchItem(items[i], id)
+      if (item) {
+        return item
+      }
+    }
+  }
+
   return (
     <div className="App">
       <GridRenderer
@@ -226,6 +279,7 @@ const App = () => {
         onDragLeave={onDragLeave}
         onDragEnd={onDragEnd}
         onDrop={onDrop}
+        onClick={onClick}
       />
       <div className="insert-indicator" ref={insertIndicator}></div>
     </div>
