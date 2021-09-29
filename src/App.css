@@ -15,14 +15,14 @@ body {
   margin: var(--gutter);
 }
 
-.insert-location {
+.insert-indicator {
   display: none;
   position: absolute;
   pointer-events: none;
   border-top: 2px solid var(--gray1);
 }
 
-  .insert-location.active {
+  .insert-indicator.active {
     display: block;
   }
 

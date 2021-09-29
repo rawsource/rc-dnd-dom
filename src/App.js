@@ -146,7 +146,7 @@ const App = () => {
   )
 
   const [ target, setTarget ] = useState(undefined)
-  const insertLocation = useRef(null)
+  const insertIndicator = useRef(null)
 
   const onDrag = (event) => {
     setTarget(event.target)
@@ -157,15 +157,17 @@ const App = () => {
 
   const onDragEnd = (event) => {
     target && target.classList.remove('dim')
-    insertLocation.current.classList.remove('active')
+    insertIndicator.current.classList.remove('active')
     setTarget(undefined)
   }
 
   const onDragLeave = (event) => {
-    insertLocation.current.classList.remove('active')
+    insertIndicator.current.classList.remove('active')
   }
 
   const onDragOver = (event) => {
+    event.preventDefault()
+
     if (event.target === target) {
       return
     }
@@ -174,22 +176,20 @@ const App = () => {
       return
     }
 
-    event.preventDefault()
-
-    insertLocation.current.classList.add('active')
+    insertIndicator.current.classList.add('active')
 
     const rect = event.target.getBoundingClientRect()
     const scrollY = Math.round(window.scrollY)
     const y = event.clientY - rect.top
 
     if (y > rect.height / 2) {
-      insertLocation.current.attributeStyleMap.set('top', CSS.px(rect.top + scrollY + rect.height))
+      insertIndicator.current.attributeStyleMap.set('top', CSS.px(rect.top + scrollY + rect.height))
     } else {
-      insertLocation.current.attributeStyleMap.set('top', CSS.px(rect.top + scrollY))
+      insertIndicator.current.attributeStyleMap.set('top', CSS.px(rect.top + scrollY))
     }
 
-    insertLocation.current.attributeStyleMap.set('left', CSS.px(rect.left))
-    insertLocation.current.attributeStyleMap.set('width', CSS.px(rect.width))
+    insertIndicator.current.attributeStyleMap.set('left', CSS.px(rect.left))
+    insertIndicator.current.attributeStyleMap.set('width', CSS.px(rect.width))
   }
 
   const onDrop = (event) => {
@@ -227,7 +227,7 @@ const App = () => {
         onDragEnd={onDragEnd}
         onDrop={onDrop}
       />
-      <div className="insert-location" ref={insertLocation}></div>
+      <div className="insert-indicator" ref={insertIndicator}></div>
     </div>
   )
 }
