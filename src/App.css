@@ -62,3 +62,17 @@ body {
 .display-block {
   display: block;
 }
+
+.editor {
+  display: flex;
+}
+
+.layout-pane {
+  flex: 1;
+}
+
+.properties-pane {
+  width: 400px;
+  background: var(--gray4);
+  margin-left: var(--gutter);
+}
