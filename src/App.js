@@ -175,9 +175,7 @@ const App = () => {
 
   const onDrag = (event) => {
     setTarget(event.target)
-    requestAnimationFrame(() => {
-      target && event.target.classList.add('dim')
-    })
+    event.target.classList.add('dim')
   }
 
   const onDragEnd = (event) => {
@@ -252,8 +250,8 @@ const App = () => {
       }
     }
 
-    setData([...data])
     onDragEnd(event)
+    setData([...data])
   }
 
   const onClick = (event) => {
