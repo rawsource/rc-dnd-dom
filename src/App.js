@@ -7,9 +7,10 @@ const Component = ({ item, onDrag }) => {
     <div
       className="item"
       draggable="true"
+      data-id={item.id}
       onDrag={onDrag}
     >
-      {item.data.name}
+      {item.component.data.name}
     </div>
   )
 }
@@ -34,12 +35,13 @@ const Row = ({ item, onDrag, onClick }) => {
   )
 }
 
-const Column = ({ item: { children }, onDrag, onClick }) => {
+const Column = ({ item, onDrag, onClick }) => {
   return (
     <div
       className="col"
+      data-id={item.id}
     >
-      {children.map(item => (
+      {item.children.map(item => (
         <Select key={item.id} item={item} onDrag={onDrag} onClick={onClick} />
       ))}
     </div>
@@ -49,7 +51,7 @@ const Column = ({ item: { children }, onDrag, onClick }) => {
 const Select = ({ item, onDrag, onClick }) => {
   switch (item.type) {
     case 'component':
-      return item.component && <Component item={item.component} onDrag={onDrag} />
+      return item.component && <Component item={item} onDrag={onDrag} />
     case 'row':
       return <Row item={item} onDrag={onDrag} onClick={onClick} />
     default:
@@ -221,53 +223,73 @@ const App = () => {
     const rect = event.target.getBoundingClientRect()
     const y = event.clientY - rect.top
 
-    if (event.target.classList.contains('col') && event.target.children.length === 0) {
-      event.target.appendChild(target)
-      return
-    }
+    if (event.target.classList.contains('col')) {
+      const res1 = findItem(data, target.dataset.id)
+      const item = res1.items[res1.index]
 
-    if (event.target.classList.contains('col') && event.target.children.length > 0) {
-      event.target.appendChild(target)
-      return
-    }
-
-    if (event.target.parentNode.classList.contains('col')) {
-      if (y > rect.height / 2) {
-        event.target.parentNode.insertBefore(target, event.target.nextSibling)
-      } else {
-        event.target.parentNode.insertBefore(target, event.target)
+      const res2 = findItem(data, event.target.dataset.id)
+      if (res2) {
+        res1.items.splice(res1.index, 1)
+        if (y > rect.height / 2) {
+          res2.items[res2.index].children.push(item)
+        } else {
+          res2.items[res2.index].children.unshift(item)
+        }
       }
     }
+    else if (event.target.parentNode.classList.contains('col')) {
+      const res1 = findItem(data, target.dataset.id)
+      const item = res1.items[res1.index]
+
+      const res2 = findItem(data, event.target.dataset.id)
+      if (res2) {
+        res1.items.splice(res1.index, 1)
+        if (y > rect.height / 2) {
+          res2.items.splice(res2.index + 1, 0, item)
+        } else {
+          res2.items.splice(res2.index, 0, item)
+        }
+      }
+    }
+
+    setData([...data])
+    onDragEnd(event)
   }
 
   const onClick = (event) => {
     if (event.target.classList.contains('row')) {
-      const res = searchItems(data, event.target.dataset.id)
-      res.children.push({ type: 'column', id: crypto.randomUUID(), children: [] })
+      const res = findItem(data, event.target.dataset.id)
+      res.items[res.index].children.push({ type: 'column', id: crypto.randomUUID(), children: [] })
       setData([...data])
     }
   }
 
-  const searchItem = (item, id) => {
-    if (item.id === id) {
-      return item
-    } else if (item.children != null) {
-      let result = null
-      for (let i = 0; result == null && i < item.children.length; i++) {
-        result = searchItem(item.children[i], id)
+  const _findItem = (item, id) => {
+    if (item.children != null) {
+      for (let i = 0; i < item.children.length; i++) {
+        if (item.children[i].id === id) {
+          return {items: item.children, index: i}
+        }
+        let result = _findItem(item.children[i], id)
+        if (result) {
+          return result
+        }
       }
-      return result
     }
     return null
   }
 
-  const searchItems = (items, id) => {
+  const findItem = (items, id) => {
     for (let i = 0; i < items.length; i++) {
-      let item = searchItem(items[i], id)
-      if (item) {
-        return item
+      if (items[i].id === id) {
+        return {items: items, index: i}
+      }
+      let result = _findItem(items[i], id)
+      if (result) {
+        return result
       }
     }
+    return null
   }
 
   return (
