@@ -1,34 +1,242 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useRef, useEffect } from 'react'
+
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const Component = ({ item, onDrag }) => {
+  return (
+    <div
+      className="item"
+      draggable="true"
+      data-id={item.id}
+      onDrag={onDrag}
+    >
+      {item.component.data.name}
+    </div>
+  )
+}
+
+const Row = ({ item, onDrag, onClick }) => {
+  return (
+    <div
+      className="row"
+      draggable="true"
+      data-id={item.id}
+      onDrag={onDrag}
+      onClick={onClick}
+    >
+      {item.children.map(item => (
+        <Column
+          key={item.id}
+          item={item}
+          onDrag={onDrag}
+        />
+      ))}
+    </div>
+  )
+}
+
+const Column = ({ item, onDrag, onClick }) => {
+  return (
+    <div
+      className="col"
+      data-id={item.id}
+    >
+      {item.children.map(item => (
+        <Select key={item.id} item={item} onDrag={onDrag} onClick={onClick} />
+      ))}
+    </div>
+  )
+}
+
+const Select = ({ item, onDrag, onClick }) => {
+  switch (item.type) {
+    case 'component':
+      return item.component && <Component item={item} onDrag={onDrag} />
+    case 'row':
+      return <Row item={item} onDrag={onDrag} onClick={onClick} />
+    default:
+      return null
+  }
+}
+
+const GridRenderer = ({ data, onDrag, onDragOver, onDragLeave, onDragEnd, onDrop, onClick }) => (
+  <div
+    className="row display-block"
+    onDragEnd={onDragEnd}
+    onDrop={onDrop}
+  >
+    <div
+      className="col"
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+    >
+      {data.map(item => (
+        <Select key={item.id} item={item} onDrag={onDrag} onClick={onClick} />
+      ))}
+    </div>
+  </div>
+)
+
+
+const App = () => {
+
+  const [ data, setData ] = useState([])
+  const [ target, setTarget ] = useState(undefined)
+  const [ activeItem, setActiveItem ] = useState(undefined)
+
+  const insertIndicator = useRef(null)
+
+  useEffect(() => {
+    setData(JSON.parse(localStorage.getItem('layout')))
+  }, [])
+
+  const onDrag = (event) => {
+    setTarget(event.target)
+    event.target.classList.add('dim')
+  }
+
+  const onDragEnd = (event) => {
+    target && target.classList.remove('dim')
+    insertIndicator.current.classList.remove('active')
+    setTarget(undefined)
+  }
+
+  const onDragLeave = (event) => {
+    insertIndicator.current.classList.remove('active')
+  }
+
+  const onDragOver = (event) => {
+    event.preventDefault()
+
+    if (event.target === target) {
+      return
+    }
+
+    if (!event.target.classList.contains('col') && !event.target.parentNode.classList.contains('col')) {
+      return
+    }
+
+    insertIndicator.current.classList.add('active')
+
+    const rect = event.target.getBoundingClientRect()
+    const scrollY = Math.round(window.scrollY)
+    const y = event.clientY - rect.top
+
+    if (y > rect.height / 2) {
+      insertIndicator.current.attributeStyleMap.set('top', CSS.px(rect.top + scrollY + rect.height))
+    } else {
+      insertIndicator.current.attributeStyleMap.set('top', CSS.px(rect.top + scrollY))
+    }
+
+    insertIndicator.current.attributeStyleMap.set('left', CSS.px(rect.left))
+    insertIndicator.current.attributeStyleMap.set('width', CSS.px(rect.width))
+  }
+
+  const onDrop = (event) => {
+    event.stopPropagation()
+
+    const rect = event.target.getBoundingClientRect()
+    const y = event.clientY - rect.top
+
+    if (event.target.classList.contains('col')) {
+      const res1 = findItem(data, target.dataset.id)
+      const item = res1.items[res1.index]
+
+      const res2 = findItem(data, event.target.dataset.id)
+      if (res2) {
+        res1.items.splice(res1.index, 1)
+        if (y > rect.height / 2) {
+          res2.items[res2.index].children.push(item)
+        } else {
+          res2.items[res2.index].children.unshift(item)
+        }
+      }
+    }
+    else if (event.target.parentNode.classList.contains('col')) {
+      const res1 = findItem(data, target.dataset.id)
+      const item = res1.items[res1.index]
+
+      const res2 = findItem(data, event.target.dataset.id)
+      if (res2) {
+        res1.items.splice(res1.index, 1)
+        if (y > rect.height / 2) {
+          res2.items.splice(res2.index + 1, 0, item)
+        } else {
+          res2.items.splice(res2.index, 0, item)
+        }
+      }
+    }
+
+    onDragEnd(event)
+
+    localStorage.setItem('layout',  JSON.stringify(data))
+
+    setData([...data])
+  }
+
+  const onClick = (event) => {
+    const res = findItem(data, event.target.dataset.id)
+    const item = res.items[res.index]
+
+    if (item.type === 'component') {
+
+    } else if (item.type === 'row') {
+
+    }
+
+    // if (event.target.classList.contains('row')) {
+    //   const res = findItem(data, event.target.dataset.id)
+    //   res.items[res.index].children.push({ type: 'column', id: crypto.randomUUID(), children: [] })
+    //   setData([...data])
+    // }
+  }
+
+  const _findItem = (item, id) => {
+    if (item.children != null) {
+      for (let i = 0; i < item.children.length; i++) {
+        if (item.children[i].id === id) {
+          return {items: item.children, index: i}
+        }
+        let result = _findItem(item.children[i], id)
+        if (result) {
+          return result
+        }
+      }
+    }
+    return null
+  }
+
+  const findItem = (items, id) => {
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].id === id) {
+        return {items: items, index: i}
+      }
+      let result = _findItem(items[i], id)
+      if (result) {
+        return result
+      }
+    }
+    return null
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="App">
+      <div className="editor">
+        <div className="layout-pane">
+          <GridRenderer
+            data={data}
+            onDrag={onDrag}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDragEnd={onDragEnd}
+            onDrop={onDrop}
+            onClick={onClick}
+          />
+          <div className="insert-indicator" ref={insertIndicator}></div>
+        </div>
+        <div className="properties-pane"></div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
