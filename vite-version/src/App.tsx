@@ -87,7 +87,11 @@ const App = () => {
   const insertIndicator = useRef(null)
 
   useEffect(() => {
-    setData(JSON.parse(localStorage.getItem('layout')))
+    let data = localStorage.getItem('layout')
+    if (!data) {
+      data = '[{"type":"row","id":"fe41a012-8079-4458-bf38-7f4d07b6a05b","children":[{"type":"column","id":"4a1b25a2-7780-4bc8-90eb-808202802825","children":[{"type":"row","id":"cb875c3b-1053-4800-99fa-fd03d211594f","children":[{"type":"column","id":"28aa1a9b-7604-4d1a-a738-f5b75110c8c6","children":[]},{"type":"column","id":"1a704410-d2a4-414c-9a78-d26d1fd6a393","children":[]}]}]},{"type":"column","id":"ac62583f-cc0a-43c7-849e-f5696b3a44f5","children":[{"component":{"data":{"name":"Item 1"},"type":"BasicWidget"},"type":"component","id":"8d12f736-bc11-4a03-8c83-95c3a3b3e982"},{"component":{"data":{"name":"Item 2"},"type":"BasicWidget"},"type":"component","id":"58283438-460b-4f56-8ea1-dc5a8775d9f4"},{"component":{"data":{"name":"Item 3"},"type":"BasicWidget"},"type":"component","id":"a09e99a6-121a-42b3-ab60-bb6cad7545f4"}]},{"type":"column","id":"ebb71138-112c-4e2d-8466-2333cdb9cc1d","children":[{"type":"row","id":"a7140653-1eb7-4766-8132-32772bbc5893","children":[{"type":"column","id":"c4d05324-b33a-464c-80e2-796a7e329467","children":[]},{"type":"column","id":"e96787b6-bdaf-4dcf-9ada-de699d2e00fc","children":[]}]}]}]}]'
+    }
+    setData(JSON.parse(data))
   }, [])
 
   const onDrag = (event) => {
